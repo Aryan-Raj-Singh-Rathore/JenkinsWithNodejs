@@ -88,7 +88,7 @@ pipeline {
 
         stage('Deploy to AKS') {
             steps {
-                bat "kubectl apply -f To-do-list-main/Test.yaml"
+                bat "kubectl apply -f blogWebsite-main/Test.yaml"
             }
         }
     }
