@@ -12,25 +12,11 @@ spec:
       labels:
         app: nodejs-app
     spec:
-      nodeSelector:
-        "kubernetes.io/os": windows
       containers:
         - name: nodejs
           image: acrrathore.azurecr.io/nodejsdocker1:latest
-          command:
-            [
-              "powershell",
-              "-Command",
-              "npm install; npm run lint; npm test; npm start",
-            ]
           ports:
             - containerPort: 3000
-      tolerations:
-        - key: "os"
-          operator: "Equal"
-          value: "windows"
-          effect: "NoSchedule"
-
 ---
 apiVersion: v1
 kind: Service
@@ -41,5 +27,6 @@ spec:
   selector:
     app: nodejs-app
   ports:
-    - port: 80
+    - protocol: TCP
+      port: 80
       targetPort: 3000
