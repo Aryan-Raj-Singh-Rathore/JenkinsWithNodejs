@@ -1,34 +1,45 @@
-name: Node.js CI
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodejs-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nodejs-app
+  template:
+    metadata:
+      labels:
+        app: nodejs-app
+    spec:
+      nodeSelector:
+        "kubernetes.io/os": windows
+      containers:
+        - name: nodejs
+          image: acrrathore.azurecr.io/nodejsdocker1:latest
+          command:
+            [
+              "powershell",
+              "-Command",
+              "npm install; npm run lint; npm test; npm start",
+            ]
+          ports:
+            - containerPort: 3000
+      tolerations:
+        - key: "os"
+          operator: "Equal"
+          value: "windows"
+          effect: "NoSchedule"
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x]
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: "npm"
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run lint
-        run: npm run lint
-
-      - name: Run tests
-        run: npm test
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodejs-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: nodejs-app
+  ports:
+    - port: 80
+      targetPort: 3000
