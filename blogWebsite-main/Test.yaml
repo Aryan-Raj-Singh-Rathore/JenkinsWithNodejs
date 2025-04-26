@@ -17,6 +17,7 @@ spec:
           image: acrrathore.azurecr.io/nodejsdocker1:latest
           ports:
             - containerPort: 3000
+
 ---
 apiVersion: v1
 kind: Service
@@ -27,6 +28,5 @@ spec:
   selector:
     app: nodejs-app
   ports:
-    - protocol: TCP
-      port: 80
+    - port: 80
       targetPort: 3000
